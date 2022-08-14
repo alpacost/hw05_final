@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+<h1>Привет, я автор</h1>
+<h2> И я совсем не умею верстать...</h2>
+<h4>
+  Меня зовут Ярослав. Я из города Воронеж. Я решил учиться писать код, потому что это кажется мне
+  действительно интересным. Это долгий и сложный путь, но с помощью моей команды поддержки у меня все получится.
+</h4>
+<a href="https://github.com/alpacost">
+  Это ссылка на мой guthub.
+</a>
+<img src="{% static 'img/cup_of_otto.jpg' %}" alt="Otto" width="220" height="300" class = "rounded mx-auto d-block">
+<h5 class = "text-center">
+  А это моя кружка и мой главный помошник.
+</h5>
+{% endblock %}
