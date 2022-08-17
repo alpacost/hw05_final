@@ -44,7 +44,7 @@ def profile(request, username):
         follow = get_object_or_404(User, username=username)
         Follow.objects.get(user=request.user, author=follow)
         following = True
-    except :
+    except Exception:
         following = False
     context = {
         'full_name': full_name,
