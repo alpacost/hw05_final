@@ -1,7 +1,7 @@
 import unittest
 
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -66,7 +66,6 @@ class TestPostForms(TestCase):
         )
         self.assertEqual(Post.objects.count(), count_posts)
         self.assertEqual(Post.objects.get(pk=1).text, new_post['text'])
-
 
 
 if __name__ == '__main__':

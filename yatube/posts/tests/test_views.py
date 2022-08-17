@@ -1,14 +1,14 @@
 import unittest
 
-from django.core.cache import cache
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from ..forms import PostForm
-from ..models import Group, Post
+from ..models import Follow, Group, Post, User
 
 User = get_user_model()
 
@@ -34,7 +34,11 @@ class TestPostsViews(TestCase):
 
     def setUp(self):
         self.authorized_client = Client()
-        self.authorized_client.force_login(TestPostsViews.user)
+        self.authorized_client.force_login(self.user)
+        self.tess = User.objects.create_user(username='Vasya')
+        self.tester_client = Client()
+        self.tester_client.force_login(self.tess)
+        self.newbie = User.objects.create_user(username='test')
 
     def test_namespase(self):
         """ Тестирвание namespace"""
@@ -137,7 +141,7 @@ class TestPostsViews(TestCase):
         }
         posts = Post.objects.create(
             text='tasty',
-            author=TestPostsViews.user,
+            author=self.user,
             group=self.group
         )
         for template, namespace in templates.items():
@@ -167,8 +171,10 @@ class TestPostsViews(TestCase):
             author=self.user
         )
         templates = (reverse('posts:index'),
-                     reverse('posts:profile', kwargs={'username': self.user.username}),
-                     reverse('posts:group_list', kwargs={'slug': self.group.slug}),
+                     reverse('posts:profile',
+                             kwargs={'username': self.user.username}),
+                     reverse('posts:group_list',
+                             kwargs={'slug': self.group.slug}),
                      )
         for namespace in templates:
             with self.subTest(value=namespace):
@@ -189,6 +195,38 @@ class TestPostsViews(TestCase):
         response = self.authorized_client.get(reverse('posts:index'))
         form_field = response.context.get('page_obj').object_list
         self.assertNotIn(self.test_post, form_field)
+
+    def test_follow(self):
+        self.tester_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.user.username}))
+        follow = Follow.objects.filter(user=self.tess, author=self.user)
+        self.assertTrue(follow.exists())
+        self.tester_client.get(
+            reverse('posts:profile_unfollow',
+                    kwargs={'username': self.user.username})
+        )
+        self.assertFalse(follow.exists())
+
+    def test_follow_index(self):
+        template = reverse('posts:follow_index')
+        expected_values = {
+            self.authorized_client: 0,
+            self.tester_client: 1
+        }
+        self.tester_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.newbie.username}))
+        for client, value in expected_values.items():
+            with self.subTest(value=template):
+                Post.objects.create(
+                    text='яблоко',
+                    author=self.newbie
+                )
+                response = client.get(template)
+                filed = response.context.get('page_obj').object_list
+                self.assertEqual(len(filed), value)
+                Post.objects.all().delete()
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
 {% block title %}
-  Последние обновления на сайте
+  Подписки
 {% endblock %}
 {% load cache %}
 {% cache 20 index_page %}
@@ -9,7 +9,7 @@
 {% include 'posts/includes/switcher.html' %}
 <main>
   <div class="container py-5">
-    <h1>Последние обновления на сайте</h1>
+    <h1>Подписки</h1>
     {% for post in page_obj %}
       <ul>
         <li >

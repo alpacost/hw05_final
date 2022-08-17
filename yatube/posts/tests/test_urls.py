@@ -72,8 +72,11 @@ class StaticUrlTests(TestCase):
 
     def test_404_page(self):
         """ Тестирвание перехода на несуществующую страницу """
-        response = self.client.get('/unexisting_page/')
+
+        template = 'core/404.html'
+        response = self.client.get('/unexciting_page/')
         self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, template)
 
     def test_comment_form(self):
         comment_number = Comment.objects.filter(post=self.post.pk).count()
