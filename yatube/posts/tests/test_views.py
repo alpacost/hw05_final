@@ -202,16 +202,8 @@ class TestPostsViews(TestCase):
                     kwargs={'username': self.user.username}))
         follow = Follow.objects.filter(user=self.tess, author=self.user)
         self.assertTrue(follow.exists())
-        self.tester_client.get(
-            reverse('posts:profile_unfollow',
-                    kwargs={'username': self.user.username})
-        )
-        self.assertFalse(follow.exists())
 
     def test_unfollow(self):
-        self.tester_client.get(
-            reverse('posts:profile_follow',
-                    kwargs={'username': self.user.username}))
         follow = Follow.objects.filter(user=self.tess, author=self.user)
         self.tester_client.get(
             reverse('posts:profile_unfollow',

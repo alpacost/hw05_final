@@ -86,7 +86,9 @@ class TestPostForms(TestCase):
                     data=new_comment,
                     follow=True
                 )
-                comments = Comment.objects.filter(post=self.post.pk).count()
+                comments = Comment.objects.filter(
+                    post=self.post.pk,
+                    text=new_comment['text']).count()
                 self.assertEqual(comments, number)
 
 

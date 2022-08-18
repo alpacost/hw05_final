@@ -11,6 +11,7 @@ def index(request):
     page_obj = pagination(request, post_list)
     context = {
         'page_obj': page_obj,
+        'index': True,
     }
     return render(request, 'posts/index.html', context)
 
@@ -121,7 +122,8 @@ def follow_index(request):
     posts = Post.objects.filter(author__following__user=request.user)
     page_obj = pagination(request, posts)
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'follow': True
     }
     return render(request, 'posts/follow.html', context)
 
