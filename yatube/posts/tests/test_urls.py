@@ -2,9 +2,8 @@ import unittest
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-from django.urls import reverse
 
-from ..models import Comment, Group, Post
+from ..models import Group, Post
 
 User = get_user_model()
 
@@ -77,28 +76,6 @@ class StaticUrlTests(TestCase):
         response = self.client.get('/unexciting_page/')
         self.assertEqual(response.status_code, 404)
         self.assertTemplateUsed(response, template)
-
-    def test_comment_form(self):
-        comment_number = Comment.objects.filter(post=self.post.pk).count()
-        namespace = (
-            reverse('posts:add_comment', kwargs={'post_id': self.post.pk})
-        )
-        new_comment = {
-            'text': "Тест"
-        }
-        expected_number = {
-            self.client: comment_number,
-            self.authorized_client: comment_number + 1
-        }
-        for user, number in expected_number.items():
-            with self.subTest(value=namespace):
-                user.post(
-                    namespace,
-                    data=new_comment,
-                    follow=True
-                )
-                comments = Comment.objects.filter(post=self.post.pk).count()
-                self.assertEqual(comments, number)
 
 
 if __name__ == '__main__':

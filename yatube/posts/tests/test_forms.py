@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Post
+from ..models import Comment, Post
 
 User = get_user_model()
 
@@ -66,6 +66,28 @@ class TestPostForms(TestCase):
         )
         self.assertEqual(Post.objects.count(), count_posts)
         self.assertEqual(Post.objects.get(pk=1).text, new_post['text'])
+
+    def test_comment_form(self):
+        comment_number = Comment.objects.filter(post=self.post.pk).count()
+        namespace = (
+            reverse('posts:add_comment', kwargs={'post_id': self.post.pk})
+        )
+        new_comment = {
+            'text': "Тест"
+        }
+        expected_number = {
+            self.client: comment_number,
+            self.authorized_client: comment_number + 1
+        }
+        for user, number in expected_number.items():
+            with self.subTest(value=namespace):
+                user.post(
+                    namespace,
+                    data=new_comment,
+                    follow=True
+                )
+                comments = Comment.objects.filter(post=self.post.pk).count()
+                self.assertEqual(comments, number)
 
 
 if __name__ == '__main__':
